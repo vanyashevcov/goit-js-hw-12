@@ -67,8 +67,17 @@ const functionSearch = async first => {
     const images = renderImages(hits);
     gallery.insertAdjacentHTML(first ? 'afterbegin' : 'beforeend', images);
 
-    buttonLoadMore.style.visibility = page < totalPages ? 'visible' : 'hidden';
-    page += 1;
+    if (page < totalPages) {
+      buttonLoadMore.style.visibility = 'visible';
+    } else {
+      buttonLoadMore.style.visibility = 'hidden';
+      iziToast.info({
+        iconColor: '#fff',
+        imageWidth: 24,
+        messageColor: '#fff',
+        message: "We're sorry, but you've reached the end of search results.",
+      });
+    }
 
     if (!first) {
       scrollGallery();
