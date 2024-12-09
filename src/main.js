@@ -1,5 +1,4 @@
 import iziToast from 'izitoast';
-
 import 'izitoast/dist/css/iziToast.min.css';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import SimpleLightbox from 'simplelightbox';
@@ -11,7 +10,6 @@ const form = document.querySelector('.form');
 const gallery = document.querySelector('ul.gallery');
 const loader = document.querySelector('.loader');
 const buttonLoadMore = document.querySelector('.button-search-more');
-const section = document.querySelector('section');
 
 let lightbox = new SimpleLightbox('.gallery a', {
   captionsData: 'alt',
@@ -27,14 +25,6 @@ let page = 1;
 let perPage = 15;
 let searchText = '';
 let totalPages = 0;
-
-const scrollGallery = () => {
-  const cardHeight = document.querySelector('.gallery-item').offsetHeight;
-  window.scrollBy({
-    top: cardHeight * 2,
-    behavior: 'smooth',
-  });
-};
 
 const functionSearch = async first => {
   try {
@@ -60,7 +50,6 @@ const functionSearch = async first => {
           'Sorry, there are no images matching your search query. Please try again!',
       });
       loader.style.display = 'none';
-      gallery.innerHTML = '';
       return;
     }
 
@@ -79,8 +68,16 @@ const functionSearch = async first => {
       });
     }
 
+    page += 1;
+
     if (!first) {
-      scrollGallery();
+      const lastImage = document.querySelector('.gallery-item:last-child');
+      if (lastImage) {
+        lastImage.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }
     }
 
     lightbox.refresh();
@@ -100,39 +97,28 @@ const functionSearch = async first => {
 
 const createGallery = e => {
   e.preventDefault();
-  const newSearchText = e.target.elements.search.value.trim();
+  searchText = e.target.elements.search.value.trim();
 
-  if (newSearchText === searchText && searchText !== '') {
-    iziToast.warning({
-      iconColor: '#fff',
-      imageWidth: 24,
-      messageColor: '#fff',
-      message: 'You are already searching for this query.',
-    });
-    return;
-  }
-
-  if (newSearchText === '') {
+  if (!searchText) {
     iziToast.error({
       iconUrl: errorIcon,
       iconColor: '#fff',
       imageWidth: 24,
       messageColor: '#fff',
-      message: 'Please write a query for search.',
+      message: 'Please write a query for search',
     });
     return;
   }
 
-  searchText = newSearchText;
   loader.style.display = 'block';
+  buttonLoadMore.style.visibility = 'hidden';
   functionSearch(true);
 };
 
 const addItemInGallery = () => {
-  buttonLoadMore.style.display = 'none';
   loader.style.display = 'block';
-  section.insertAdjacentElement('beforeend', loader);
-  functionSearch();
+  buttonLoadMore.style.visibility = 'hidden';
+  functionSearch(false);
 };
 
 form.addEventListener('submit', createGallery);
