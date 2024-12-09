@@ -29,7 +29,7 @@ let totalPages = 0;
 const functionSearch = async first => {
   try {
     if (first) {
-      page = 1;
+      page = 1; 
     }
 
     const { hits, totalHits } = await searchImage(searchText, page, perPage);
@@ -71,11 +71,14 @@ const functionSearch = async first => {
     page += 1;
 
     if (!first) {
-      const lastImage = document.querySelector('.gallery-item:last-child');
-      if (lastImage) {
-        lastImage.scrollIntoView({
+      const galleryItems = document.querySelectorAll('.gallery-item');
+      if (galleryItems.length >= 2) {
+        const twoCardsHeight =
+          galleryItems[0].getBoundingClientRect().height +
+          galleryItems[1].getBoundingClientRect().height;
+        window.scrollBy({
+          top: twoCardsHeight,
           behavior: 'smooth',
-          block: 'start',
         });
       }
     }
